@@ -1,11 +1,11 @@
-package edu.auk.java_proj;
+package edu.auk.java_proj.pojo;
 
 public class Greetings {
 	private final long id;
 	private final String content;
 
 	public Greetings(long id, String content) {
-		this.id = id;
+        this.id = id;
 		this.content = content;
 	}
 

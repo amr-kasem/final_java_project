@@ -1,10 +1,12 @@
-package edu.auk.java_proj;
+package edu.auk.java_proj.rest;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import edu.auk.java_proj.pojo.Greetings;
 
 @RestController
 public class GreetingController {
