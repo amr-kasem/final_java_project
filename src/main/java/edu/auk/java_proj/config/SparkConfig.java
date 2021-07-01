@@ -14,7 +14,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 @PropertySource("classpath:application.properties")
 public class SparkConfig {
  
-    @Value("${spark.app.name:spark-sprint-boot}")
+    @Value("${spark.app.name:spark-sprin}")
     private String appName;
 
     @Value("${spark.master.uri:local[2]}")
@@ -33,14 +33,13 @@ public class SparkConfig {
     public JavaSparkContext javaSparkContext() {
         return new JavaSparkContext(sparkConf());
     }
-    // @Bean
-    // public SparkSession sparkSession() {
-    //     return SparkSession
-    //             .builder()
-    //             .sparkContext(javaSparkContext().sc())
-    //             .appName("Integrating Spring-boot with Apache Spark")
-    //             .getOrCreate();
-    // }
+    @Bean
+    public SparkSession sparkSession() {
+        return SparkSession
+                .builder()
+                .sparkContext(javaSparkContext().sc())
+                .getOrCreate();
+    }
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {

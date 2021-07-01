@@ -2,56 +2,45 @@ package edu.auk.java_proj.dao.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoder;
+import org.apache.spark.sql.Encoders;
+
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
 import edu.auk.java_proj.dao.JobDAO;
 import edu.auk.java_proj.pojo.Job;
-// import scala.Function8;
+
 @Repository
 public class JobDAOImpl implements JobDAO {
-    // @Autowired
-    private JavaRDD<String> data;
+    private static Dataset<Job> jobs;
     @Autowired
-    private  JavaSparkContext javaSparkContext;
+    private SparkSession sparkSession;
 
     @PostConstruct
-    private void init(){
+    private void init() {
         String fileName = "Wuzzuf_Jobs.csv";
         String f = getClass().getClassLoader().getResource(fileName).getFile();
-        data = javaSparkContext.textFile(f);
-
-        System.out.println(data.first());
-    }
-
-
-    @Override
-    public List<Job> getJobs() {
-        List<Job> jobs = new ArrayList<Job>();
-        data.foreach(l -> {
-            String[] vStrings = l.split(",");
-            // jobFactory.apply(vStrings[0], vStrings[1], vStrings[2], vStrings[3],
-            // vStrings[4], vStrings[5], vStrings[6],vStrings[7]);
-            Job j = new Job(vStrings[0], vStrings[1], vStrings[2], vStrings[3], vStrings[4], vStrings[5], vStrings[6],
-            vStrings[7]);
-            jobs.add(j);
-            
-            System.out.println(jobs.size());
-        });
         
-
-        // jobs.stream().forEach(System.out::println);
-        System.out.println(jobs.size());
-        return null;
+        jobs =sparkSession.read().option("header","true").csv(f).as(Encoders.bean(Job.class)); 
+        jobs.foreach(x->{System.out.println(x.title);});
     }
 
     @Override
-    public List<Job> findJobs(Job j) {
+    public Dataset<Job> getJobs() {
+        System.out.println(jobs.count());
+
+        return jobs;
+    }
+
+    @Override
+    public Dataset<Job> findJobs(Job j) {
         // TODO Auto-generated method stub
         return null;
     }

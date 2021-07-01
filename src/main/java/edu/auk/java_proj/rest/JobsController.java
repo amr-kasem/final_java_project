@@ -8,11 +8,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.PostConstruct;
 
-import com.nimbusds.jose.shaded.json.writer.BeansMapper.Bean;
-
-import org.apache.commons.configuration2.beanutils.BeanFactory;
-import org.apache.spark.sql.execution.streaming.StreamingSymmetricHashJoinHelper.JoinStateValueWatermarkPredicate;
-import org.apache.spark.status.api.v1.JobData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,8 +33,9 @@ public class JobsController {
 	}
 	@GetMapping("/jobs")
 	public String jobs() {
-		// System.out.println(jobDAO);
-		jobDAO.getJobs();
-		return "d.stitle";
+		// System.out.println(jobDAO.getJobs().first().getTitle());
+		// jobDAO.getJobs().;
+		// jobDAO.getJobs().;
+		return "done";
 	}
 }

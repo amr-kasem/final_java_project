@@ -1,10 +1,10 @@
 package edu.auk.java_proj.pojo;
-// import java.io.Serializable;
 
 import java.io.Serializable;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
 @Component
 @Scope(value = "prototype")
 public class Job implements Serializable{
@@ -16,19 +16,19 @@ public class Job implements Serializable{
     public String location;
     public String type;
     public String level;
-    public String years_exp;
+    public String yearsExp;
     public String country;
     public String skills;
 
-    // public Job(){};
-    public Job(String title, String company, String location, String type, String level, String years_exp,
+    public Job(){};
+    public Job(String title, String company, String location, String type, String level, String yearsExp,
             String country, String skills) {
         this.title = title;
         this.company = company;
         this.location = location;
         this.type = type;
         this.level = level;
-        this.years_exp = years_exp;
+        this.yearsExp = yearsExp;
         this.country = country;
         this.skills = skills;
     }
@@ -53,8 +53,8 @@ public class Job implements Serializable{
         return this.level;
     }
 
-    public String getYears_exp() {
-        return this.years_exp;
+    public String getYearsExp() {
+        return this.yearsExp;
     }
 
     public String getCountry() {
@@ -85,8 +85,8 @@ public class Job implements Serializable{
         this.level = level;
     }
 
-    public void setYears_exp(String years_exp) {
-        this.years_exp = years_exp;
+    public void setYearsExp(String yearsExp) {
+        this.yearsExp = yearsExp;
     }
 
     public void setCountry(String country) {
