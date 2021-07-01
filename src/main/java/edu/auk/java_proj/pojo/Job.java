@@ -1,8 +1,16 @@
 package edu.auk.java_proj.pojo;
 // import java.io.Serializable;
 
-// public class Job implements Serializable{
-public class Job{
+import java.io.Serializable;
+
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+@Component
+@Scope(value = "prototype")
+public class Job implements Serializable{
+// public class Job {
+    // @Id
+    // @GeneratedValue(strategy = GenerationType.AUTO)
     public String title;
     public String company;
     public String location;
@@ -12,6 +20,7 @@ public class Job{
     public String country;
     public String skills;
 
+    // public Job(){};
     public Job(String title, String company, String location, String type, String level, String years_exp,
             String country, String skills) {
         this.title = title;
@@ -86,5 +95,10 @@ public class Job{
 
     public void setSkills(String skills) {
         this.skills = skills;
+    }
+
+    @Override
+    public String toString() {
+        return title;
     }
 }

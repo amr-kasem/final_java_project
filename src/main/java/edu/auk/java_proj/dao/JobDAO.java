@@ -1,10 +1,14 @@
 package edu.auk.java_proj.dao;
 
+import java.io.Serializable;
 import java.util.List;
 
-import edu.auk.java_proj.pojo.Job;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-public interface JobDAO {
+import edu.auk.java_proj.pojo.Job;
+// @Repository
+public interface JobDAO extends Serializable{
     List<Job> getJobs();
     List<Job> findJobs(Job j);
     Boolean addJob(Job j);
