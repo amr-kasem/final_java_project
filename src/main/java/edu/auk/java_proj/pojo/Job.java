@@ -1,6 +1,7 @@
 package edu.auk.java_proj.pojo;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -100,5 +101,17 @@ public class Job implements Serializable{
     @Override
     public String toString() {
         return title;
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(title);
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Job job = (Job) o;
+        return title == job.title &&
+                Objects.equals(company, job.company);
     }
 }

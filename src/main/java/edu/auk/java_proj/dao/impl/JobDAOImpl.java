@@ -1,21 +1,16 @@
 package edu.auk.java_proj.dao.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-
 import javax.annotation.PostConstruct;
 
 import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 
-import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import edu.auk.java_proj.dao.JobDAO;
 import edu.auk.java_proj.pojo.Job;
+import scala.reflect.internal.Trees.Return;
 
 @Repository
 public class JobDAOImpl implements JobDAO {
@@ -27,22 +22,24 @@ public class JobDAOImpl implements JobDAO {
     private void init() {
         String fileName = "Wuzzuf_Jobs.csv";
         String f = getClass().getClassLoader().getResource(fileName).getFile();
-        
-        jobs =sparkSession.read().option("header","true").csv(f).as(Encoders.bean(Job.class)); 
-        jobs.foreach(x->{System.out.println(x.title);});
+
+        jobs = sparkSession.read().option("header", "true").csv(f).as(Encoders.bean(Job.class));
     }
 
     @Override
-    public Dataset<Job> getJobs() {
-        System.out.println(jobs.count());
-
+    public Dataset<Job> findAll() {
         return jobs;
     }
 
     @Override
-    public Dataset<Job> findJobs(Job j) {
+    public Dataset<Job> find(Job j) {
         // TODO Auto-generated method stub
-        return null;
+        Dataset<Job> r = sparkSession.emptyDataset(Encoders.bean(Job.class));
+        if (j.title != null)
+            r = jobs.filter("title ='" + j.title + "'");
+        if (j.country != null)
+            r = jobs.filter("country ='" + j.country + "'");
+        return r;
     }
 
     @Override
