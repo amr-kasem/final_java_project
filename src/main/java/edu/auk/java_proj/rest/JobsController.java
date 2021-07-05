@@ -61,9 +61,9 @@ public class JobsController {
 
 	@GetMapping(path = "/summary", produces = "application/json; charset=UTF-8")
 	@ResponseBody
-	public ResponseEntity<List<String>> summary() {
-		jobDAO.findAll().summary().show();
-		return ResponseEntity.ok(jobDAO.findAll().summary().toJSON().collectAsList());
+	public ResponseEntity<List<HashMap<String, Object>>> summary() {
+		Dataset<Row> s = jobDAO.findAll().summary();
+		return ResponseEntity.ok(rowToJson(s));
 	}
 
 	@GetMapping(path = "/structure", produces = "application/json; charset=UTF-8")
@@ -87,14 +87,16 @@ public class JobsController {
 
 	@GetMapping(path = "/jobs_per_company", produces = "application/json; charset=UTF-8")
 	@ResponseBody
-	public ResponseEntity<List<HashMap<String, Long>>> jobsPerCompany() {
+	public ResponseEntity<List<HashMap<String, Object>>> jobsPerCompany() {
 		Dataset<Row> s = jobDAO.findAll().groupBy("company").agg(count("company").alias("count"))
 				.sort(col("count").desc());
-		List<HashMap<String, Long>> result = s.collectAsList().stream().map(f -> {
-			HashMap<String, Long> r = new HashMap<String, Long>();
-			r.put(f.getString(0), f.getLong(1));
+		return ResponseEntity.ok(rowToJson(s));
+	}
+	private List<HashMap<String, Object>> rowToJson(Dataset<Row> s){
+		return s.collectAsList().stream().map(f -> {
+			HashMap<String, Object> r = new HashMap<String, Object>();
+			r.put(f.getString(0), f.get(1));
 			return r;
 		}).collect(Collectors.toList());
-		return ResponseEntity.ok(result);
 	}
 }
