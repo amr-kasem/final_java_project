@@ -22,17 +22,6 @@ public class Job implements Serializable{
     public String skills;
 
     public Job(){};
-    public Job(String title, String company, String location, String type, String level, String yearsExp,
-            String country, String skills) {
-        this.title = title;
-        this.company = company;
-        this.location = location;
-        this.type = type;
-        this.level = level;
-        this.yearsExp = yearsExp;
-        this.country = country;
-        this.skills = skills;
-    }
 
     public String getTitle() {
         return this.title;
