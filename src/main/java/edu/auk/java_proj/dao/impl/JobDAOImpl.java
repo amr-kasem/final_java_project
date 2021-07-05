@@ -10,25 +10,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import edu.auk.java_proj.dao.JobDAO;
 import edu.auk.java_proj.pojo.Job;
+import scala.reflect.internal.Trees.Return;
 
 @Repository
 public class JobDAOImpl implements JobDAO {
-
-
     private static Dataset<Job> jobs;
+    @Autowired
+    private SparkSession sparkSession;
 
-    public JobDAOImpl(){
+    @PostConstruct
+    private void init() {
         String fileName = "Wuzzuf_Jobs.csv";
         String f = getClass().getClassLoader().getResource(fileName).getFile();
 
         jobs = sparkSession.read().option("header", "true").csv(f).as(Encoders.bean(Job.class));
     }
-    @Autowired
-    private SparkSession sparkSession;
-
-    // @PostConstruct
-    // private void init() {
-
 
     @Override
     public Dataset<Job> findAll() {
