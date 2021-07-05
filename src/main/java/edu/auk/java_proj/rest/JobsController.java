@@ -95,21 +95,21 @@ public class JobsController {
 	@GetMapping(path = "/jobs_per_company", produces = "application/json; charset=UTF-8")
 	@ResponseBody
 	public ResponseEntity<List<JsonObject>> jobsPerCompany() {
-		Dataset<Row> s = jobDAO.findAll().groupBy("company").agg(count("company").alias("count"))
+		Dataset<Row> s = jobDAO.findAll().withColumn("company_norm", trim(lower(col("company")))).groupBy("company_norm").agg(count("company_norm").alias("count"))
 				.sort(col("count").desc());
 		return ResponseEntity.ok(rowToJson(s));
 	}
 	@GetMapping(path = "/jobs_popularity", produces = "application/json; charset=UTF-8")
 	@ResponseBody
 	public ResponseEntity<List<JsonObject>> jobsPopularity() {
-		Dataset<Row> s = jobDAO.findAll().groupBy("title").agg(count("title").alias("count"))
+		Dataset<Row> s = jobDAO.findAll().withColumn("title_norm", trim(lower(col("title")))).groupBy("title_norm").agg(count("title_norm").alias("count"))
 				.sort(col("count").desc());
 		return ResponseEntity.ok(rowToJson(s));
 	}
 	@GetMapping(path = "/area_popularity", produces = "application/json; charset=UTF-8")
 	@ResponseBody
 	public ResponseEntity<List<JsonObject>> areaPopularity() {
-		Dataset<Row> s = jobDAO.findAll().groupBy("location").agg(count("location").alias("count"))
+		Dataset<Row> s = jobDAO.findAll().withColumn("location_norm", trim(lower(col("location")))).groupBy("location_norm").agg(count("location_norm").alias("count"))
 				.sort(col("count").desc());
 		return ResponseEntity.ok(rowToJson(s));
 	}
@@ -117,6 +117,13 @@ public class JobsController {
 	@ResponseBody
 	public ResponseEntity<List<JsonObject>> skills() {
 		Dataset<Row> s = jobDAO.findAll().selectExpr("explode(split(Skills,',')) as skill").withColumn("skill", trim(lower(col("skill")))).groupBy("skill").count().alias("count").sort(col("count").desc());
+		return ResponseEntity.ok(rowToJson(s));
+	}
+	@GetMapping(path = "/years_factorized", produces = "application/json; charset=UTF-8")
+	@ResponseBody
+	public ResponseEntity<List<JsonObject>> years_fact() {
+		Dataset<Job> j = jobDAO.findAll();
+		Dataset<Row> s = j.toDF().withColumn("yearsExp_factored", regexp_extract(col("yearsExp"), "([0-9]*)", 1).cast("int"));
 		return ResponseEntity.ok(rowToJson(s));
 	}
 	private Gson gson = new Gson();
