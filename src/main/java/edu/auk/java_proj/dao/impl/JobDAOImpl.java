@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import edu.auk.java_proj.dao.JobDAO;
 import edu.auk.java_proj.pojo.Job;
-import scala.reflect.internal.Trees.Return;
 
 @Repository
 public class JobDAOImpl implements JobDAO {

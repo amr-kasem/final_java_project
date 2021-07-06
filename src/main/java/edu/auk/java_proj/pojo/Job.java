@@ -95,12 +95,16 @@ public class Job implements Serializable{
     public int hashCode() {
         return Objects.hash(title);
     }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == this)
+            return true;
+        if (!(o instanceof Job)) {
+            return false;
+        }
         Job job = (Job) o;
-        return title == job.title &&
-                Objects.equals(company, job.company);
+        return Objects.equals(title, job.title) && Objects.equals(company, job.company) && Objects.equals(location, job.location) && Objects.equals(type, job.type) && Objects.equals(level, job.level) && Objects.equals(yearsExp, job.yearsExp) && Objects.equals(country, job.country) && Objects.equals(skills, job.skills);
     }
+    
 }
