@@ -1,15 +1,12 @@
 package com.mycompany.clienttester;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,33 +17,42 @@ import org.knowm.xchart.CategoryChartBuilder;
 import org.knowm.xchart.PieChart;
 import org.knowm.xchart.PieChartBuilder;
 import org.knowm.xchart.SwingWrapper;
+import org.knowm.xchart.internal.chartpart.Chart;
 import org.knowm.xchart.style.Styler;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class DAO {
+    private Gson gson = new Gson();
+    private OkHttpClient client = new OkHttpClient();
+    private Type listType = new TypeToken<List<JsonObject>>() {
+    }.getType();
 
-    public void DrawPieChartFromJSON(String title, int Slice_No, boolean Others, String JsonPath)
-            throws MalformedURLException, IOException {
-        // Connect to the URL using java's native library
-        URL url = new URL(JsonPath);
-        URLConnection request = url.openConnection();
-        request.connect();
-
-        // Convert to a JSON object to print data
-        JsonParser jp = new JsonParser(); // from gson
-        JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); // Convert the input
-                                                                                                // stream to a json
-                                                                                                // element
-        JsonArray rootobj = root.getAsJsonArray();
-
-        List<String> Elements = rootobj.get(0).getAsJsonObject().keySet().stream().collect(Collectors.toList());
-
-        List<String> ElementsNames = new ArrayList<>();
-        List<Integer> Count = new ArrayList<>();
-
-        for (int i = 0; i < Slice_No; i++) {
-            ElementsNames.add(rootobj.get(i).getAsJsonObject().get(Elements.get(0)).getAsString());
-            Count.add(rootobj.get(i).getAsJsonObject().get(Elements.get(1)).getAsInt());
+    private void displayChart(Chart c) {
+        JFrame frame = new SwingWrapper(c).displayChart();
+        javax.swing.SwingUtilities.invokeLater(() -> frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE));
+    }
+    private static String fixedLengthString(String string, int length) {
+        return String.format("%1$"+length+ "s", string);
+    }
+    public List<JsonObject> getData(String url) throws IOException {
+        Request request = new Request.Builder().url(url).build();
+        try (Response response = client.newCall(request).execute()) {
+            return gson.fromJson(response.body().string(), listType);
         }
+        
+    }
+
+    public void DrawPieChartFromJSON(String title, int Slice_No, boolean Others, String col1, String col2,
+            String JsonPath)
+
+            throws MalformedURLException, IOException {
+        List<JsonObject> Elements = getData(JsonPath);
+
+        List<String> ElementsNames = Elements.stream().map(e -> e.get(col1).getAsString()).collect(Collectors.toList());
+        List<Integer> Count = Elements.stream().map(e -> e.get(col2).getAsInt()).collect(Collectors.toList());
 
         PieChart pieChart = new PieChartBuilder().width(1024 * 2).height(768 * 2).title(title).build();
         // adding sets to chart
@@ -56,57 +62,33 @@ public class DAO {
 
         // Adding Others
         if (Others) {
-
-            int Others_Count = 0;
-            for (int i = Slice_No; i < rootobj.size(); i++) {
-                Others_Count += rootobj.get(i).getAsJsonObject().get(Elements.get(1)).getAsInt();
-            }
-            pieChart.addSeries("Others", Others_Count);
+            pieChart.addSeries("Others",
+                    Count.subList(Slice_No + 1, Count.size()).stream().collect(Collectors.summingInt(m -> m)));
         }
 
+        displayChart(pieChart);
         // display chart
-        JFrame frame = new SwingWrapper(pieChart).displayChart();
-        javax.swing.SwingUtilities.invokeLater(() -> frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE));
 
     }
 
-    public void DrawBarChartFromJSON(String title, int Slice_No, boolean Others, String JsonPath)
-            throws MalformedURLException, IOException {
+    public void DrawBarChartFromJSON(String title, int Slice_No, boolean Others, String col1, String col2,
+            String JsonPath) throws MalformedURLException, IOException {
         // Connect to the URL using java's native library
-        URL url = new URL(JsonPath);
-        URLConnection request = url.openConnection();
-        request.connect();
+        List<JsonObject> Elements = getData(JsonPath);
 
-        // Convert to a JSON object to print data
-        JsonParser jp = new JsonParser(); // from gson
-        JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); // Convert the input
-                                                                                                // stream to a json
-                                                                                                // element
-        JsonArray rootobj = root.getAsJsonArray();
-
-        // Getting Elements Names of JSON
-        List<String> Elements = rootobj.get(0).getAsJsonObject().keySet().stream().collect(Collectors.toList());
-
-        // Splitting Elements Names
-        List<String> ElementsNames = new ArrayList<>();
-        List<Integer> Count = new ArrayList<>();
-
-        for (int i = 0; i < Slice_No; i++) {
-            ElementsNames.add(rootobj.get(i).getAsJsonObject().get(Elements.get(0)).getAsString());
-            Count.add(rootobj.get(i).getAsJsonObject().get(Elements.get(1)).getAsInt());
-        }
+        List<String> ElementsNames = Elements.subList(0, Slice_No).stream().map(e -> e.get(col1).getAsString())
+                .collect(Collectors.toList());
+        List<Integer> Count = Elements.stream().map(e -> e.get(col2).getAsInt()).collect(Collectors.toList());
+        Integer other_count = Count.subList(Slice_No + 1, Count.size()).stream().collect(Collectors.summingInt(m -> m));
+        Count = Count.subList(0, Slice_No);
         if (Others) {
-            int Others_Count = 0;
-            for (int i = Slice_No; i < rootobj.size(); i++) {
-                Others_Count += rootobj.get(i).getAsJsonObject().get(Elements.get(1)).getAsInt();
-            }
             ElementsNames.add("Others");
-            Count.add(Others_Count);
+            Count.add(other_count);
         }
 
         // Creating The Bar Chart
-        CategoryChart chart = new CategoryChartBuilder().width(1024 * 2).height(768 * 2).title(title)
-                .xAxisTitle(Elements.get(0)).yAxisTitle(Elements.get(1)).build();
+        CategoryChart chart = new CategoryChartBuilder().width(1024 * 2).height(768 * 2).title(title).xAxisTitle(col1)
+                .yAxisTitle(col2).build();
 
         chart.getStyler().setLegendPosition(Styler.LegendPosition.InsideNW);
         chart.getStyler().setHasAnnotations(true); // numbers inside blocks
@@ -114,8 +96,37 @@ public class DAO {
         chart.addSeries(title, ElementsNames, Count);
         // Display
         chart.getStyler().setXAxisLabelRotation(45);
-        JFrame frame = new SwingWrapper(chart).displayChart();
-        javax.swing.SwingUtilities.invokeLater(() -> frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE));
-
+        displayChart(chart);
+    }
+    public void printJson(String JsonPath,int Slice_No) throws IOException{
+        List<JsonObject> data = getData(JsonPath);
+        if (Slice_No != -1) data = data.subList(0, Slice_No);
+        data.stream().forEach(o->{
+            System.out.println(o.toString());
+        });
+        System.out.print("Press any key to Continue...");
+        System.in.read();
+        System.out.println();
+    }
+    void printTable( String JsonPath,int Slice_No) throws IOException {
+        List<JsonObject> data = getData(JsonPath);
+        if (Slice_No != -1) data = data.subList(0, Slice_No);
+        data.get(0).keySet().stream().forEach(s->{
+            System.out.print(fixedLengthString(s, 12));
+            System.out.print('\t');
+        });
+        System.out.println();
+        data.stream().forEach(o->{
+            o.entrySet().stream().forEach(s->{
+                String v;
+                v = s.getValue().getAsString();
+                System.out.print(fixedLengthString(v.substring(0,v.length()>12?12:v.length()), 12));
+                System.out.print('\t');
+            });
+            System.out.println();
+        });
+        System.out.print("Press any key to Continue...");
+        System.in.read();
+        System.out.println();
     }
 }
