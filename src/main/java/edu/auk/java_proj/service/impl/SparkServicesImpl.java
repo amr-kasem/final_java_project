@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import edu.auk.java_proj.service.SparkServices;
 @Service
 public class SparkServicesImpl implements SparkServices{
-    public String test(){
+    public String kmeans(){
         return "hello";
     }
 }

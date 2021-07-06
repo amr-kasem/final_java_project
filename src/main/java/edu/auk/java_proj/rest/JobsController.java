@@ -86,8 +86,8 @@ public class JobsController {
 
 	@GetMapping(path = "/structure", produces = "application/json; charset=UTF-8")
 	@ResponseBody
-	public ResponseEntity<StructType> structure() {
-		return ResponseEntity.ok(jobDAO.findAll().schema());
+	public ResponseEntity<Object> structure() {
+		return ResponseEntity.ok(jobDAO.findAll().schema().fields());
 	}
 
 	@GetMapping(path = "/describe", produces = "application/json; charset=UTF-8")
@@ -142,7 +142,7 @@ public class JobsController {
 	@GetMapping(path = "/kmeans", produces = "application/json; charset=UTF-8")
 	@ResponseBody
 	public String kmeans() {
-		return sparkServices.test();
+		return sparkServices.kmeans();
 	}
 
 
