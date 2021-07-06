@@ -106,8 +106,10 @@ public class CLI {
             System.out.println("########################################");
             for (int i = 0; i < tasks.length; i++)
                 System.out.println(Integer.toString(i) + ") " + tasks[i].getMessage());
+            
             System.out.print("Input Command Number: ");
             int input_value = input.nextInt();
+            System.out.println();
             if(tasks[input_value].action())
                 break;
         }

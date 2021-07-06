@@ -125,8 +125,10 @@ public class DAO {
             });
             System.out.println();
         });
-        System.out.print("Press any key to Continue...");
+        System.out.println();
+        System.out.println("Press Enter key to Continue...");
         System.in.read();
+        System.out.println();
         System.out.println();
     }
 }
